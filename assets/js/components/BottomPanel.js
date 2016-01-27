@@ -1,6 +1,6 @@
 var React = require('react');
 
-var Clock = require('./clock');
+var Clock = require('./Clock');
 
 var BottomPanel = React.createClass({
     render: function() {

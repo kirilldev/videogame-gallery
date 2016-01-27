@@ -4,8 +4,8 @@
   "description": "Front end browser for your videogame roms collection",
   "main": "main.js",
   "scripts": {
-    "build": "browserify -t [ babelify --presets [ react ] ] assets/js/web-app.js -o assets/js/web-app.min.js -d",
-    "watch": "watchify -t [ babelify --presets [ react ] ] assets/js/web-app.js -o assets/js/web-app.min.js -v"
+    "build": "browserify -t [ babelify --presets [ es2015 react ] ] assets/js/web-app.js -o assets/js/web-app.min.js -d",
+    "watch": "watchify -t [ babelify --presets [ es2015 react ] ] assets/js/web-app.js -o assets/js/web-app.min.js -v"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "three": "^0.73.2"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
     "browserify": "latest",
     "watchify": "latest"
   }

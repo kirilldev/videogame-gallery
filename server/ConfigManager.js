@@ -18,15 +18,18 @@ try {
 } catch (e) {
     if (e.code !== 'ENOENT') {
         console.log(e);
-    } else {
-        userConfig = {};
-        fs.writeFileSync(Constant.userConfig, JSON.stringify(userConfig), {encoding: 'utf8'});
     }
 }
 
-
 const ConfigManager = {
     getConfig: function () {
+        return userConfig;
+    },
+    createAndGet: function (rootPath) {
+        fs.readdirSync(rootPath);
+        userConfig = {romsRoot: rootPath};
+        fs.writeFileSync(Constant.userConfig, JSON.stringify(userConfig), {encoding: 'utf8'});
+        console.log("Config file was saved!");
         return userConfig;
     }
 };

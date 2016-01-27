@@ -9,22 +9,21 @@ const RomsCache = require('./server/RomsCache');
 const APP_PORT = 3001;
 
 /*
-RomsCache.indexAndGet('E:/GoogleDrive/EMULATION/ROMS');
-*/
+ RomsCache.indexAndGet('E:/GoogleDrive/EMULATION/ROMS');
+ */
 
 app.use('/assets', express.static('assets'));
 app.get('/', (req, res) =>  res.sendfile('./views/index.html'));
 app.get('/getRomsInfo', (req, res) => res.json(RomsCache.getIndexed()));
 app.get('/saveRomsFolder', (req, res) => {
-    console.log(req.query.url);
-    res.json(RomsCache.indexAndGet(req.query.url))
+    console.log(req.query.path);
+    res.json(ConfigManager.createAndGet(req.query.path));
 });
 app.get('/getUserConfig', (req, res) => {
     const response = {
         config: ConfigManager.getConfig(),
-        isFirstRun: Object.keys(ConfigManager.getConfig()).length === 0
+        isFirstRun: ConfigManager.getConfig() == null
     };
     res.json(response);
 });
-
 app.listen(APP_PORT, () => console.log('App listening on ' + APP_PORT + ' port!'));

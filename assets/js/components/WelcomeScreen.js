@@ -1,7 +1,19 @@
 var React = require('react');
+var $ = require('jquery');
 
 var WelcomeScreen = React.createClass({
-    validateAndSavePath: function(){
+    getInitialState () {
+        return {path: ""}
+    },
+    handlePathChange: function (e) {
+        this.setState({path: e.target.value});
+    },
+    createConfig: function () {
+        console.log(this.props.configCreatedHandler);
+        $.get('saveRomsFolder', {path: this.state.path}, this.props.configCreatedHandler)
+            .fail(function () {
+                alert("error");
+            });
     },
     render: function () {
         return (
@@ -9,9 +21,10 @@ var WelcomeScreen = React.createClass({
                 <div>
                     <h1>Welcome to Video Game Gallery!</h1>
                     Type path to your folder with roms:<br/>
-                    <input style={{width: "100%", padding: "6px 4px"}}/><br/>
+                    <input onChange={this.handlePathChange} style={{width: "100%", padding: "6px 4px"}}/><br/>
+
                     <div style={{textAlign:"right", marginTop: "20px"}}>
-                        <button className="Btn" onClick={this.validateAndSavePath}>Save</button>
+                        <button className="Btn" onClick={this.createConfig}>Save</button>
                     </div>
                 </div>
             </div>

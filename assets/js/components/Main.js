@@ -8,10 +8,17 @@ var Loader = require('./Loader');
 var WelcomeScreen = require('./WelcomeScreen');
 
 var Main = React.createClass({
+
+    configCreatedHandler: function (config) {
+        this.setState({
+            userConfig: config,
+            isConfigAbsent: false
+        });
+    },
     getInitialState: function () {
         return {
             isAppLoaded: false,
-            isFirstRun: false,
+            isConfigAbsent: false,
             romsInfo: null,
             userConfig: null
         };
@@ -21,31 +28,20 @@ var Main = React.createClass({
 
         $.get('getUserConfig', function (configResponse) {
             console.log(configResponse);
-
-/*            var lastGist = result[0];
-            if (component.isMounted()) {
-                component.setState({
-                    username: lastGist.owner.login,
-                    lastGistUrl: lastGist.html_url
-                });
-            }*/
-
-            $.get('getRomsInfo', function (romsResponse) {
-   /*             var lastGist = result[0];
-                if (this.isMounted()) {
-                    this.setState({
-                        username: lastGist.owner.login,
-                        lastGistUrl: lastGist.html_url
-                    });
-                }*/
-
+            if (configResponse.isFirstRun) {
                 component.setState({
                     isAppLoaded: true,
-                    isFirstRun : configResponse.isFirstRun,
-                    userConfig: configResponse.config,
-                    romsInfo : romsResponse
+                    isConfigAbsent: true
                 });
-            });
+            } else {
+                $.get('getRomsInfo', function (romsResponse) {
+                    component.setState({
+                        isAppLoaded: true,
+                        userConfig: configResponse.config,
+                        romsInfo: romsResponse
+                    });
+                });
+            }
         });
     },
     render: function () {
@@ -53,10 +49,13 @@ var Main = React.createClass({
 
         if (!this.state.isAppLoaded) {
             bodyComponents = <div id="gallery" className="gallery"><Loader /></div>;
-        } else if (this.state.isAppLoaded && this.state.isFirstRun) {
-            bodyComponents = <div id="gallery" className="gallery"><WelcomeScreen /></div>;
+        } else if (this.state.isAppLoaded && this.state.isConfigAbsent) {
+            bodyComponents = <div id="gallery" className="gallery">
+                <WelcomeScreen configCreatedHandler={this.configCreatedHandler}/>
+            </div>;
         } else {
-            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery"><CoverFlow /></div>, <BottomPanel />];
+            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery"><CoverFlow /></div>,
+                <BottomPanel />];
         }
 
         return (
