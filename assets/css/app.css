@@ -23,6 +23,18 @@ body {
     box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.4);
 }
 
+.Btn {
+    font-size: 22px;
+    background-color: #00bfe9;
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    padding: 0 20px 0 20px;
+    height: 38px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .Clock_time_time {
     color: #333333;
 }

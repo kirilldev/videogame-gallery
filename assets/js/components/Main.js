@@ -5,6 +5,7 @@ var AplphabetNav = require('./AplphabetNav');
 var CoverFlow = require('./CoverFlow');
 var BottomPanel = require('./BottomPanel');
 var Loader = require('./Loader');
+var WelcomeScreen = require('./WelcomeScreen');
 
 var Main = React.createClass({
     getInitialState: function () {
@@ -48,22 +49,18 @@ var Main = React.createClass({
         });
     },
     render: function () {
-        var bodyComponent = null;
+        var bodyComponents = null;
 
         if (!this.state.isAppLoaded) {
-            bodyComponent = <Loader />;
+            bodyComponents = <div id="gallery" className="gallery"><Loader /></div>;
         } else if (this.state.isAppLoaded && this.state.isFirstRun) {
-            bodyComponent = '<div>select elements</div>';
+            bodyComponents = <div id="gallery" className="gallery"><WelcomeScreen /></div>;
         } else {
-            bodyComponent = <CoverFlow />;
+            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery"><CoverFlow /></div>, <BottomPanel />];
         }
 
         return (
-            <div>
-                <AplphabetNav />
-                <div id="gallery" className="gallery">{bodyComponent}</div>
-                <BottomPanel />
-            </div>
+            <div>{bodyComponents}</div>
         )
     }
 });

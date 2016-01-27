@@ -2,22 +2,15 @@
 
 const express = require('express');
 const fs = require('fs');
-const fs2json = require('fs2json');
 const app = express();
 const Constant = require('./server/Constant');
 const ConfigManager = require('./server/ConfigManager');
 const RomsCache = require('./server/RomsCache');
 const APP_PORT = 3001;
 
-try {
-    fs.accessSync(Constant.dataDir, fs.F_OK);
-} catch (e) {
-    if (e.code === 'ENOENT') {
-        fs.mkdirSync(Constant.dataDir);
-    }
-}
-
+/*
 RomsCache.indexAndGet('E:/GoogleDrive/EMULATION/ROMS');
+*/
 
 app.use('/assets', express.static('assets'));
 app.get('/', (req, res) =>  res.sendfile('./views/index.html'));
