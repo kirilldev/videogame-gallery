@@ -10,9 +10,18 @@ var WelcomeScreen = require('./WelcomeScreen');
 var Main = React.createClass({
 
     configCreatedHandler: function (config) {
-        this.setState({
-            userConfig: config,
-            isConfigAbsent: false
+        var component = this;
+
+        $.get('getRomsInfo', {refreshCache: true}, function (romsResponse) {
+            component.setState({
+                isAppLoaded: true,
+                isConfigAbsent: false,
+                userConfig: config,
+                romsInfo: romsResponse,
+                currentConsole: "GENESIS"
+            });
+
+            console.log(romsResponse);
         });
     },
     getInitialState: function () {
@@ -20,7 +29,8 @@ var Main = React.createClass({
             isAppLoaded: false,
             isConfigAbsent: false,
             romsInfo: null,
-            userConfig: null
+            userConfig: null,
+            currentConsole: null
         };
     },
     componentDidMount: function () {
@@ -38,7 +48,8 @@ var Main = React.createClass({
                     component.setState({
                         isAppLoaded: true,
                         userConfig: configResponse.config,
-                        romsInfo: romsResponse
+                        romsInfo: romsResponse,
+                        currentConsole: "GENESIS"
                     });
                 });
             }
@@ -54,7 +65,8 @@ var Main = React.createClass({
                 <WelcomeScreen configCreatedHandler={this.configCreatedHandler}/>
             </div>;
         } else {
-            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery"><CoverFlow /></div>,
+            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery">
+                <CoverFlow console={this.state.currentConsole} romsInfo={this.state.romsInfo}/></div>,
                 <BottomPanel />];
         }
 

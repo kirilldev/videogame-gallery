@@ -9,7 +9,6 @@ var WelcomeScreen = React.createClass({
         this.setState({path: e.target.value});
     },
     createConfig: function () {
-        console.log(this.props.configCreatedHandler);
         $.get('saveRomsFolder', {path: this.state.path}, this.props.configCreatedHandler)
             .fail(function () {
                 alert("error");

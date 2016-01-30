@@ -14,7 +14,9 @@ const APP_PORT = 3001;
 
 app.use('/assets', express.static('assets'));
 app.get('/', (req, res) =>  res.sendfile('./views/index.html'));
-app.get('/getRomsInfo', (req, res) => res.json(RomsCache.getIndexed()));
+app.get('/getRomsInfo', (req, res) => {
+    res.json(RomsCache.getIndexed(req.query.refreshCache))
+});
 app.get('/saveRomsFolder', (req, res) => {
     console.log(req.query.path);
     res.json(ConfigManager.createAndGet(req.query.path));

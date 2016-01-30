@@ -1,12 +1,18 @@
 var Constant = require('../../../server/Constant');
 var THREE = require('three');
 
+
+var loadTexture = function (url, onLoad, onError) {
+    var loader = new THREE.TextureLoader();
+    return loader.load(url, onLoad, undefined, onError);
+};
+
 var ThreeCoverLoader = {
     load: function (path, platform) {
         var boxSize = Constant.platform[platform].boxSize;
         var textureRegion = Constant.platform[platform].textureRegion;
 
-        var sideTexture = new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('assets/img/side.png')});
+        var sideTexture = new THREE.MeshBasicMaterial({map: loadTexture('assets/img/side.png')});
         var sideLong = [
             new THREE.Vector2(0, 1),
             new THREE.Vector2(0, 0),
@@ -21,7 +27,7 @@ var ThreeCoverLoader = {
             new THREE.Vector2(1, 1)
         ];
 
-        var coverTexture = THREE.ImageUtils.loadTexture(path);
+        var coverTexture = loadTexture(path);
         coverTexture.minFilter = THREE.NearestMipMapNearestFilter;
         coverTexture.magFilter = THREE.LinearMipMapLinearFilter;
         var atlasMaterial = new THREE.MeshBasicMaterial({map: coverTexture});

@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const Constant = require('./Constant');
+const ConfigManager = require('./ConfigManager');
 
 let indexedRoms = null;
 
@@ -60,11 +61,14 @@ function indexData(rootPath) {
 }
 
 const RomsCache = {
-    getIndexed: () => indexedRoms,
-    indexAndGet: function (rootPath) {
-        indexedRoms = indexData(rootPath);
-        fs.writeFileSync(Constant.romsCache, JSON.stringify(indexedRoms), {encoding: 'utf8'});
-        console.log("The file was saved!");
+    getIndexed: (refresh) => {
+        if (refresh) {
+            indexedRoms = indexData(ConfigManager.getConfig().romsRoot);
+            fs.writeFileSync(Constant.romsCache, JSON.stringify(indexedRoms), {encoding: 'utf8'});
+            console.log("The file was saved!");
+        }
+
+        return indexedRoms;
     }
 };
 
