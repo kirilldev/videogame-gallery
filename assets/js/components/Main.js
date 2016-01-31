@@ -65,8 +65,10 @@ var Main = React.createClass({
                 <WelcomeScreen configCreatedHandler={this.configCreatedHandler}/>
             </div>;
         } else {
+            var roms = this.state.romsInfo[this.state.currentConsole];
+
             bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery">
-                <CoverFlow console={this.state.currentConsole} romsInfo={this.state.romsInfo}/></div>,
+                <CoverFlow console={this.state.currentConsole} roms={roms}/></div>,
                 <BottomPanel />];
         }
 

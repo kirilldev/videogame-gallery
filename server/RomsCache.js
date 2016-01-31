@@ -49,10 +49,12 @@ function indexData(rootPath) {
         });
 
         if (value.covers.path) {
-            value.covers.list = [];
+            value.covers.list = {};
 
             fs.readdirSync(value.covers.path).forEach(filename => {
-                value.covers.list.push(filename);
+                var separatorIndex = filename.lastIndexOf('.');
+                var name = filename.substring(0, separatorIndex);
+                value.covers.list[name] = filename.substring(separatorIndex);
             });
         }
     }

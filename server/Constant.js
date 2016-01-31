@@ -3,13 +3,16 @@
 const Constants = Object.create(null);
 Constants.dataDir = __dirname + '/data';
 Constants.romsCache = Constants.dataDir + '/cache.json';
+Constants.coversCache = Constants.dataDir + '/covers';
 Constants.userConfig = Constants.dataDir + '/config.json';
 
 Constants.platform = {
     "GENESIS": {
         marketingName: "Sega Genesis",
         boxSize: {width: 5.25, length: 7.25, height: 7 / 8},
-        textureRegion: {fold1: 0.465, fold2: 0.536}
+        textureRegion: {fold1: 0.465, fold2: 0.536},
+        minTextureRegion: {offsetLeft: 0.1, fold1: 0.472, fold2: 0.536, offsetRight: 0.9}
+        //0.199
     },
     "DREAMCAST": {
         marketingName: "Sega Dreamcast",
