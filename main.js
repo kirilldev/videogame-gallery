@@ -4,6 +4,7 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const Constant = require('./server/Constant');
+const FileSystem = require('./server/FileSystem');
 const ConfigManager = require('./server/ConfigManager');
 const RomsCache = require('./server/RomsCache');
 const CoverOptimizer = require('./server/CoverOptimizer');
@@ -16,7 +17,13 @@ const APP_PORT = 3001;
 app.use('/assets', express.static('assets'));
 app.get('/', (req, res) =>  res.sendfile('./views/index.html'));
 app.get('/getRomsInfo', (req, res) => {
-    res.json(RomsCache.getIndexed(req.query.refreshCache))
+    let indexed = RomsCache.getIndexed(req.query.refreshCache);
+
+    if (!indexed) {
+        indexed = RomsCache.getIndexed(true);
+    }
+
+    res.json(indexed)
 });
 app.get('/getCover', function (req, res) {
     const optimizedCoverPath = Constant.coversCache + '/' + req.query.platform + '/' + req.query.game;
@@ -56,10 +63,24 @@ app.get('/saveRomsFolder', (req, res) => {
     res.json(ConfigManager.createAndGet(req.query.path));
 });
 app.get('/getUserConfig', (req, res) => {
+    const isFirstRun = ConfigManager.getConfig() == null;
+
     const response = {
         config: ConfigManager.getConfig(),
-        isFirstRun: ConfigManager.getConfig() == null
+        isFirstRun: isFirstRun
     };
+
     res.json(response);
 });
+
+app.get('/getFolders', (req, res) => {
+    var path = req.query.path;
+
+    if (!path) {
+        FileSystem.getDisks().then(disks => res.json({disks:disks}), console.error);
+    } else {
+        FileSystem.getFilesList(path).then(files => res.json({files:files}), console.error);
+    }
+});
+
 app.listen(APP_PORT, () => console.log('App listening on ' + APP_PORT + ' port!'));

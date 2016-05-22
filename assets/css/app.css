@@ -1,3 +1,6 @@
+@import "nw-react-slider.min.css";
+
+
 /* latin-ext */
 @font-face {
     font-family: 'Oswald';
@@ -6,6 +9,7 @@
     src: local('Oswald Regular'), local('Oswald-Regular'), url(https://fonts.gstatic.com/s/oswald/v10/yg0glPPxXUISnKUejCX4qfesZW2xOQ-xsNqO47m55DA.woff2) format('woff2');
     unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
 }
+
 /* latin */
 @font-face {
     font-family: 'Oswald';
@@ -108,6 +112,7 @@ body {
 .SettingsIcon {
     width: 60px;
     float: right;
+    cursor: pointer;
 }
 
 .alphabet {
@@ -180,11 +185,14 @@ body {
 }
 
 .BottomPannel__title {
-    border: 3px solid #636464; padding: 10px;
+    border: 3px solid #636464;
+    padding: 10px;
 }
 
 .BottomPannel__right-corner {
-    display:table-cell; width: 300px; vertical-align: top;
+    display: table-cell;
+    width: 300px;
+    vertical-align: top;
 }
 
 .BottomPannel__logo {
@@ -192,10 +200,10 @@ body {
 }
 
 #canvasss {
-    height:100%; width: 100%;
+    height: 100%;
+    width: 100%;
     background-color: transparent
 }
-
 
 @keyframes u-spin {
     0% {
@@ -206,4 +214,58 @@ body {
         -webkit-transform: rotate(359deg);
         transform: rotate(359deg)
     }
+}
+
+.blur-out {
+    -webkit-filter: blur(8px);
+    -webkit-transform: scale(1.4, 1.4);
+    opacity: 0.25;
+    -webkit-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
+    visibility: hidden;
+}
+
+.blur {
+    -webkit-animation: blur 0.5s infinite;
+}
+
+@-webkit-keyframes blur {
+    0%, 100% {
+        -webkit-filter: blur(0px);
+    }
+    50% {
+        -webkit-filter: blur(10px);
+    }
+}
+
+.omgwtfbbq {
+    -webkit-animation: omgwtfbbq 3s infinite;
+}
+
+@-webkit-keyframes omgwtfbbq {
+    0%, 100% {
+        -webkit-filter: blur(0px) brightness(none) hue-rotate(0deg) saturate(none);
+    }
+    50% {
+        -webkit-filter: brightness(10) blur(10px) hue-rotate(180deg) saturate(10);
+    }
+}
+
+#modal {
+    position: absolute;
+    background-color: #cecece;
+    top: 20%;
+    left: 25%;
+    right: 25%;
+    bottom: 25%;
+    padding: 1%;
+}
+
+.Expander {
+    cursor : pointer;
+    border:solid 1px;
+    display: inline-block;
+    width : 25px;
+    height : 25px;
+    text-align : center
 }

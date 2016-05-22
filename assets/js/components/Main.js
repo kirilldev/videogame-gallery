@@ -1,24 +1,45 @@
-var React = require('react');
-var $ = require('jquery');
+'use strict';
 
-var AplphabetNav = require('./AplphabetNav');
-var CoverFlow = require('./CoverFlow');
-var BottomPanel = require('./BottomPanel');
-var Loader = require('./Loader');
-var WelcomeScreen = require('./WelcomeScreen');
+const React = require('react');
+const ReactDOM = require('react-dom');
 
-var Main = React.createClass({
+const AjaxFetch = require('../utils/AjaxFetch');
+const AplphabetNav = require('./AplphabetNav');
+const CoverFlow = require('./CoverFlow');
+const BottomPanel = require('./BottomPanel');
+const Loader = require('./Loader');
+const WelcomeScreen = require('./WelcomeScreen');
+const ModalSettings = require('./ModalSettings');
+
+const Main = React.createClass({
+
+    _showSettings: function () {
+        ReactDOM.render(<ModalSettings />, document.getElementById('modal'));
+    },
+
+    onConsoleSelected: function () {
+        //ReactDOM.render(<ModalSettings />, document.getElementById('modal'));
+    },
 
     configCreatedHandler: function (config) {
         var component = this;
 
-        $.get('getRomsInfo', {refreshCache: true}, function (romsResponse) {
+        AjaxFetch('getRomsInfo', {refreshCache: true}).then(romsResponse => {
+            var currentConsole = null;
+
+            for (var k in romsResponse) {
+                if (!currentConsole || currentConsole > k) {
+                    currentConsole = k;
+                }
+            }
+
             component.setState({
                 isAppLoaded: true,
                 isConfigAbsent: false,
                 userConfig: config,
                 romsInfo: romsResponse,
-                currentConsole: "GENESIS"
+                currentConsole: currentConsole,
+                currentGameIndex: 0
             });
 
             console.log(romsResponse);
@@ -30,13 +51,15 @@ var Main = React.createClass({
             isConfigAbsent: false,
             romsInfo: null,
             userConfig: null,
-            currentConsole: null
+            currentConsole: null,
+            currentGameIndex: 0,
+            rotationX: 0
         };
     },
     componentDidMount: function () {
         var component = this;
 
-        $.get('getUserConfig', function (configResponse) {
+        AjaxFetch('getUserConfig').then(configResponse => {
             console.log(configResponse);
             if (configResponse.isFirstRun) {
                 component.setState({
@@ -44,17 +67,36 @@ var Main = React.createClass({
                     isConfigAbsent: true
                 });
             } else {
-                $.get('getRomsInfo', function (romsResponse) {
+                AjaxFetch('getRomsInfo').then(romsResponse => {
                     component.setState({
                         isAppLoaded: true,
                         userConfig: configResponse.config,
                         romsInfo: romsResponse,
-                        currentConsole: "GENESIS"
+                        currentConsole: "NDS",
+                        currentGameIndex: 0
                     });
                 });
             }
         });
     },
+
+    onGameChosen: function (i) {
+        this.setState({
+            currentGameIndex: i
+        });
+    },
+
+    onLetterSelected: function (letter) {
+        var roms = this.state.romsInfo[this.state.currentConsole].games.list;
+
+        for (var i = 0; i < roms.length; i++) {
+            if (roms[i].startsWith(letter)) {
+                this.onGameChosen(i);
+                return;
+            }
+        }
+    },
+
     render: function () {
         var bodyComponents = null;
 
@@ -66,10 +108,20 @@ var Main = React.createClass({
             </div>;
         } else {
             var roms = this.state.romsInfo[this.state.currentConsole];
+            var fileName = roms.games.list[this.state.currentGameIndex];
+            var gameName = fileName.substring(0, fileName.lastIndexOf('.'));
 
-            bodyComponents = [<AplphabetNav />, <div id="gallery" className="gallery">
-                <CoverFlow console={this.state.currentConsole} roms={roms}/></div>,
-                <BottomPanel />];
+            bodyComponents = [
+                <AplphabetNav key="1" gameName={gameName} alphabet={roms.games.alphabet} parent={this}
+                              letterSelected={this.onLetterSelected}/>,
+                <div key="2" id="gallery" className="gallery">
+                    <CoverFlow console={this.state.currentConsole} currentGameIndex={this.state.currentGameIndex}
+                               roms={roms} gameChosen={this.onGameChosen}
+                               coverConfig={this.state.userConfig.coverSetup}/>
+                </div>,
+                <BottomPanel key="3" console={this.state.currentConsole} gameName={gameName}
+                             showSettings={this._showSettings} selectConsole={this.onConsoleSelected}/>
+            ];
         }
 
         return (

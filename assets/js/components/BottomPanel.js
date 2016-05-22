@@ -7,13 +7,14 @@ var BottomPanel = React.createClass({
         return(
             <div className="BottomPannel">
                 <div className="BottomPannel__logo-wrapper">
-                    <img className="BottomPannel__logo" src="logo/SNES.png"/>
+                    <img className="BottomPannel__logo" onClick={this.props.selectConsole} src={"assets/img/logo/" + this.props.console + ".png"}/>
+                    <img className="SettingsIcon" src="assets/img/players.png"/>
                 </div>
                 <div className="BottomPannel__title-wrapper">
-                    <span className="BottomPannel__title">Mario Party</span>
+                    <span className="BottomPannel__title">{this.props.gameName}</span>
                 </div>
                 <div className="BottomPannel__right-corner">
-                    <img className="SettingsIcon" src="assets/img/settings1.png"/>
+                    <img className="SettingsIcon" src="assets/img/settings1.png" onClick={this.props.showSettings}/>
                     <Clock />
                 </div>
             </div>

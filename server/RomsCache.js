@@ -43,8 +43,16 @@ function indexData(rootPath) {
     for (let property in indexedObj) {
         let value = indexedObj[property];
         value.games.list = [];
+        value.games.alphabet = [];
 
         fs.readdirSync(value.games.path).forEach(filename => {
+            let c = filename.substring(0, 1);
+            let char = Number.isInteger(Number(c)) ? '#' : c.toUpperCase();
+
+            if (value.games.alphabet[value.games.alphabet.length - 1] !== char) {
+                value.games.alphabet.push(char);
+            }
+
             value.games.list.push(filename);
         });
 

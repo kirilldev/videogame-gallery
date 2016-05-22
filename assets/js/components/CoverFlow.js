@@ -8,13 +8,15 @@ var ThreeCoverLoader = require('../utils/ThreeCoverLoader');
 var Constant = require('../../../server/Constant');
 
 var visibleCovers = [];
-var currentConsole = "N64";
 var currentGameIndex = 1;
 var defaultIndent = 2;
 var distanceToCamera = -50;
+var scrollSpeed = 0.2;
 
 var state = {
-    shownCovers: []
+    shownCovers: [],
+    targetCover: 0,
+    isTransition: false
 };
 
 /*
@@ -39,25 +41,33 @@ var CoverFlow = React.createClass({
 
         mesh.position.z = distanceToCamera;
         mesh.position.x = xPos;
+        mesh.rotation.x = this.props.coverConfig.rotation.x;
         this.scene.add(mesh);
         return mesh;
     },
     _onScreenResize: function (callback) {
+        var padding = this.props.coverConfig.padding;
         var camera = this.camera;
         var gallery = this.gallery;
         camera.aspect = gallery.offsetWidth / gallery.offsetHeight;
         camera.updateProjectionMatrix();
         this.renderer.setSize(gallery.offsetWidth, gallery.offsetHeight);
-
-        console.log(Constant.platform[currentConsole].boxSize.width);
-
-        var distanceToCamera = 50;
+        var distance = distanceToCamera * -1;
         var vFOV = camera.fov * Math.PI / 180;        // convert vertical fov to radians
-        var height = 2 * Math.tan(vFOV / 2) * distanceToCamera; // visible height
+        var height = 2 * Math.tan(vFOV / 2) * distance; // visible height
         var width = height * camera.aspect;           // visible width
 
+        var v = Math.round(width / (Constant.platform[this.props.console].boxSize.width + padding));
+
+        if (v % 2 === 0) {
+            v++;
+        } else {
+            v = v + 2;
+        }
+
         this.setState({
-            coversOnScreen: Math.round(width / Constant.platform[currentConsole].boxSize.width)
+            coversOnScreen: v,
+            width: width
         }, callback);
     },
     getDefaultProps: function () {
@@ -68,32 +78,105 @@ var CoverFlow = React.createClass({
     },
     getInitialState: function () {
         return {
-            chosenGameIndex: 0,
             coversOnScreen: 0
         }
     },
     componentWillReceiveProps: function (nextProps) {
         var roms = nextProps.roms;
+
         var halfOfCovers = (this.state.coversOnScreen - 1) / 2;
-        var coversOnScreen = [];
-        coversOnScreen.push(this._addGameBoxToScene(this.state.chosenGameIndex, 0, roms));
 
-        for (var i = 1; i <= halfOfCovers; i++) {
-            coversOnScreen.push(this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(-i), -i * 7, roms));
-            coversOnScreen.push(this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(i), i * 7, roms));
+        if (state.shownCovers.length) {
+            var direction = this.props.currentGameIndex - nextProps.currentGameIndex;
+        } else {
+
+            var angle = 0.5;
+
+            for (var i = -halfOfCovers; i <= -1; i++) {
+                var xPos = (this.props.coverConfig.padding + Constant.platform[this.props.console].boxSize.width) * i;
+                var boxLeft = this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(i), xPos, roms);
+                boxLeft.romIndex = this.getRelativeToChosenCoverIndex(i);
+                state.shownCovers.push(boxLeft);
+                boxLeft.rotation.y = angle;
+                boxLeft.rotation.z = 0.1;
+            }
+
+            var focusedBox = this._addGameBoxToScene(this.props.currentGameIndex, 0, roms);
+            focusedBox.romIndex = this.props.currentGameIndex;
+            focusedBox.position.z = -46;
+            state.shownCovers.push(focusedBox);
+
+            for (var j = 1; j <= halfOfCovers; j++) {
+                var xPos = (this.props.coverConfig.padding + Constant.platform[this.props.console].boxSize.width) * j;
+                var boxRight = this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(j), xPos, roms);
+                boxRight.romIndex = this.getRelativeToChosenCoverIndex(j);
+                boxRight.rotation.y = -angle;
+                state.shownCovers.push(boxRight);
+            }
         }
-
-        state.shownCovers = coversOnScreen;
-        /*
-         scene.remove( selectedObject );
-         */
     },
     shouldComponentUpdate: function (nextProps, nextState) {
         return false;
     },
     animateScene: function () {
-        for (var i = 0; i < state.shownCovers.length; i++) {
-            //state.shownCovers[i].position.x = state.shownCovers[i].position.x + .1;
+        if (state.targetCover !== 0) {
+
+            var last = state.shownCovers.length - 1;
+            var coverHalf = Constant.platform[this.props.console].boxSize.width / 2;
+
+            if (state.targetCover < 0) {
+
+                var screenEnd = this.state.width * 0.5 + coverHalf;
+
+                for (var i = 0; i < state.shownCovers.length; i++) {
+                    state.shownCovers[i].position.x = state.shownCovers[i].position.x + scrollSpeed;
+                }
+
+                if (state.shownCovers[last].position.x > screenEnd) {
+                    var x = state.shownCovers[0].position.x;
+                    this.scene.remove(state.shownCovers.pop());
+                    var k = last / 2;
+                    var xPos = x - this.props.coverConfig.padding - Constant.platform[this.props.console].boxSize.width;
+                    var box = this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(-k - 1), xPos, this.props.roms);
+                    box.romIndex = this.getRelativeToChosenCoverIndex(-k - 1);
+                    state.shownCovers.unshift(box);
+                }
+
+            } else if (state.targetCover > 0) {
+
+                var screenStart = -this.state.width * 0.5 - coverHalf;
+
+                for (var i = 0; i < state.shownCovers.length; i++) {
+                    state.shownCovers[i].position.x = state.shownCovers[i].position.x - scrollSpeed;
+                }
+
+                if (state.shownCovers[0].position.x < screenStart) {
+                    var xx = state.shownCovers[last].position.x;
+                    this.scene.remove(state.shownCovers.shift());
+                    var kk = last / 2;
+                    var xPos = xx + this.props.coverConfig.padding + Constant.platform[this.props.console].boxSize.width;
+                    var boxx = this._addGameBoxToScene(this.getRelativeToChosenCoverIndex(kk + 1), xPos, this.props.roms);
+                    boxx.romIndex = this.getRelativeToChosenCoverIndex(kk + 1);
+                    state.shownCovers.push(boxx);
+                }
+
+            }
+
+
+            for (var z = 0; z < state.shownCovers.length; z++) {
+                var fixedNum = Number(state.shownCovers[z].position.x.toFixed(1));
+                if (fixedNum === 0) {
+
+                    if (this.getRelativeToChosenCoverIndex(state.targetCover) === state.shownCovers[z].romIndex) {
+                        state.targetCover = 0;
+                    }
+
+                    this.props.gameChosen(state.shownCovers[z].romIndex);
+                    break;
+                }
+            }
+        } else {
+
         }
 
         this.render3dScene();
@@ -102,13 +185,27 @@ var CoverFlow = React.createClass({
     componentWillMount: function () {
     },
     getRelativeToChosenCoverIndex: function (relativeIndex) {
-        var virtualIndex = this.state.chosenGameIndex + relativeIndex;
+        var virtualIndex = this.props.currentGameIndex + relativeIndex;
         var romsLength = this.props.roms.games.list.length;
 
+        debugger;
+
         if (virtualIndex < 0) {
-            return romsLength + virtualIndex;
-        } else if (virtualIndex > romsLength) {
-            return virtualIndex - romsLength
+            var front = romsLength + virtualIndex;
+
+            if (front < 0) {
+                return 0;
+            }
+
+            return front;
+        } else if (virtualIndex >= romsLength) {
+            var rear = virtualIndex - romsLength;
+
+            if (virtualIndex >= romsLength) {
+                return romsLength - 1;
+            }
+
+            return rear;
         }
 
         return virtualIndex;
@@ -126,35 +223,32 @@ var CoverFlow = React.createClass({
             this.render3dScene();
         }.bind(this));
 
-        /*        var light = new THREE.DirectionalLight(0xffffff);
-         light.position.set(0, 1, 1).normalize();
-         scene.add(light);
-         var fullwidth = 28;
-         var font = 13;
-         var side = 2
-         Darkwing Duck.jpg
-         */
+        //var light = new THREE.PointLight(0xffffff);
+        //light.position.set(0, 10, 50).normalize();
+        //light.distance = 100;
+        //light.shadowCameraVisible = true;
+        //this.scene.add(light);
+
 
         window.addEventListener('resize', this._onScreenResize, false);
 
         window.addEventListener("keydown", function (event) {
-            if (event.keyCode === 37) {
-                //left
 
-                this.setState({
-                    chosenGameIndex: this.getRelativeToChosenCoverIndex(-i)
-                });
-            } else if (event.keyCode === 39) {
-                //right
-                this.setState({
-                    chosenGameIndex: this.getRelativeToChosenCoverIndex(i)
-                });
+            if (state.targetCover === 0) {
+                if (event.keyCode === 37) {
+                    //left
+                    state.targetCover--;
+                } else if (event.keyCode === 39) {
+                    //right
+                    state.targetCover++;
+                }
             }
         }.bind(this));
 
-
-        this.render3dScene();
-        this.animateScene();
+        this._onScreenResize(function () {
+            this.render3dScene();
+            this.animateScene();
+        }.bind(this));
     },
     render: function () {
         return (<canvas id={this.props.canvasId}/>)

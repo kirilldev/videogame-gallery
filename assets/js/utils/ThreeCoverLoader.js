@@ -1,6 +1,11 @@
 var Constant = require('../../../server/Constant');
 var THREE = require('three');
 
+var MATERIALS = {
+    'BASIC': THREE.MeshBasicMaterial,
+    'SHINY': THREE.MeshPhongMaterial,
+    'NON_SHINY': THREE.MeshLambertMaterial
+};
 
 var loadTexture = function (url, onLoad, onError) {
     var loader = new THREE.TextureLoader();
@@ -11,8 +16,10 @@ var loadMesh = function (path, platform) {
     var boxSize = Constant.platform[platform].boxSize;
     var textureRegion = Constant.platform[platform].textureRegion;
     var minTextureRegion = Constant.platform[platform].minTextureRegion;
+    var vTextureRegion = Constant.platform[platform].vTextureRegion;
+    var material = 'BASIC';
 
-    var sideTexture = new THREE.MeshBasicMaterial({map: loadTexture('assets/img/side.png')});
+    var sideTexture = new MATERIALS[material]({map: loadTexture('assets/img/side.png')});
     var sideLong = [
         new THREE.Vector2(0, 1),
         new THREE.Vector2(0, 0),
@@ -30,25 +37,25 @@ var loadMesh = function (path, platform) {
     var coverTexture = loadTexture(path);
     coverTexture.minFilter = THREE.NearestMipMapNearestFilter;
     coverTexture.magFilter = THREE.LinearMipMapLinearFilter;
-    var atlasMaterial = new THREE.MeshBasicMaterial({map: coverTexture});
+    var atlasMaterial = new MATERIALS[material]({map: coverTexture});
     var atlasBack = [
-        new THREE.Vector2(minTextureRegion.offsetLeft, 1),
-        new THREE.Vector2(minTextureRegion.offsetLeft, 0),
-        new THREE.Vector2(textureRegion.fold1, 0),
-        new THREE.Vector2(textureRegion.fold1, 1)
+        new THREE.Vector2(minTextureRegion.offsetLeft, vTextureRegion.fold2),
+        new THREE.Vector2(minTextureRegion.offsetLeft, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.fold1, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.fold1, vTextureRegion.fold2)
     ];
 
     var atlasSide = [
-        new THREE.Vector2(textureRegion.fold1, 1),
-        new THREE.Vector2(textureRegion.fold1, 0),
-        new THREE.Vector2(textureRegion.fold2, 0),
-        new THREE.Vector2(textureRegion.fold2, 1)
+        new THREE.Vector2(minTextureRegion.fold1, vTextureRegion.fold2),
+        new THREE.Vector2(minTextureRegion.fold1, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.fold2, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.fold2, vTextureRegion.fold2)
     ];
     var atlasFront = [
-        new THREE.Vector2(textureRegion.fold2, 1),
-        new THREE.Vector2(textureRegion.fold2, 0),
-        new THREE.Vector2(minTextureRegion.offsetRight, 0),
-        new THREE.Vector2(minTextureRegion.offsetRight, 1)
+        new THREE.Vector2(minTextureRegion.fold2, vTextureRegion.fold2),
+        new THREE.Vector2(minTextureRegion.fold2, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.offsetRight, vTextureRegion.fold1),
+        new THREE.Vector2(minTextureRegion.offsetRight, vTextureRegion.fold2)
     ];
 
     var gameBox = new THREE.CubeGeometry(

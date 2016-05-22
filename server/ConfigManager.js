@@ -27,7 +27,18 @@ const ConfigManager = {
     },
     createAndGet: function (rootPath) {
         fs.readdirSync(rootPath);
-        userConfig = {romsRoot: rootPath};
+        userConfig = {
+            romsRoot: rootPath,
+            coverSetup: {
+                padding: 1.75,
+                rotation: {
+                    "x": 0.3,
+                    "y": 0,
+                    "z": 0.1
+                },
+                "selectedCoverZ": 46
+            }
+        };
         fs.writeFileSync(Constant.userConfig, JSON.stringify(userConfig), {encoding: 'utf8'});
         console.log("Config file was saved!");
         return userConfig;
