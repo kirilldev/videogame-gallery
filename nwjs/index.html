@@ -6,17 +6,24 @@
     <link href='dist/css/app.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<input id="browse" type='file' nwdirectory="" />
+<div id="app"></div>
 
 <script>
-    var chooser = document.getElementById('browse');
-    chooser.addEventListener("change", function(evt) {
-        console.log(this.value);
-    }, false);
 
+
+    const WINDOW_NODE = {};
+    WINDOW_NODE.fs = window.require('fs');
+    WINDOW_NODE.__dirname = process.cwd();
+
+    var gui = require('nw.gui');
+    console.log(gui.Window.isFullscreen);
+    // Create an empty menu
+    var menu = new gui.Menu();
+
+    // Add some items
+    menu.append(new gui.MenuItem({ label: 'Item A' }));
 </script>
 
-<div id="app"></div>
 <script src="dist/js/web-app.min.js"></script>
 </body>
 </html>

@@ -19,7 +19,7 @@ var loadMesh = function (path, platform) {
     var vTextureRegion = Constant.platform[platform].vTextureRegion;
     var material = 'BASIC';
 
-    var sideTexture = new MATERIALS[material]({map: loadTexture('assets/img/side.png')});
+    var sideTexture = new MATERIALS[material]({map: loadTexture('dist/img/side.png')});
     var sideLong = [
         new THREE.Vector2(0, 1),
         new THREE.Vector2(0, 0),
@@ -83,12 +83,46 @@ var loadMesh = function (path, platform) {
     ));
 };
 
+function getCover (platform, game, path) {
+    const optimizedCoverPath = Constant.coversCache + '/' + platform + '/' + game;
+
+    try {
+        WINDOW_NODE.fs.accessSync(Constant.coversCache, WINDOW_NODE.fs.F_OK);
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            WINDOW_NODE.fs.mkdirSync(Constant.coversCache);
+        }
+    }
+
+    try {
+        WINDOW_NODE.fs.accessSync(Constant.coversCache + '/' + platform, WINDOW_NODE.fs.F_OK);
+    } catch (e) {
+        if (e.code === 'ENOENT') {
+            WINDOW_NODE.fs.mkdirSync(Constant.coversCache + '/' + platform);
+        }
+    }
+
+    try {
+        WINDOW_NODE.fs.accessSync(optimizedCoverPath, WINDOW_NODE.fs.F_OK);
+        return optimizedCoverPath;
+    } catch (e) {
+        const coverPath = path + '/' + game;
+        CoverOptimizer.optimize(coverPath, optimizedCoverPath, function (err, buffer) {
+            console.log('done');
+            return optimizedCoverPath;
+        });
+    }
+    /*
+     let readStream = fs.createReadStream(req.query.uri);
+     readStream.pipe(res);*/
+}
+
 var ThreeCoverLoader = {
     loadDefault: function (platform) {
-        return loadMesh('assets/img/default-covers/' + platform + '.png', platform);
+        return loadMesh('dist/img/default-covers/' + platform + '.png', platform);
     },
     load: function (path, gameName, platform) {
-        var loadLink = 'getCover?path=' + encodeURIComponent(path) + '&platform=' + platform + '&game=' + encodeURIComponent(gameName);
+        var loadLink = getCover(platform, gameName, path);
         return loadMesh(loadLink, platform);
     }
 };

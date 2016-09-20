@@ -5,6 +5,7 @@ const ReactDOM = require('react-dom');
 
 const AjaxFetch = require('../utils/AjaxFetch');
 const RomsCache = require('../utils/RomsCache');
+const ConfigManager  = require('../utils/ConfigManager');
 const AplphabetNav = require('./AplphabetNav');
 const CoverFlow = require('./CoverFlow');
 const BottomPanel = require('./BottomPanel');
@@ -22,7 +23,16 @@ function getRomsInfo (isRefreshCache) {
     return indexed
 };
 
+function getUserConfig () {
+    const isFirstRun = ConfigManager.getConfig() == null;
 
+    const response = {
+        config: ConfigManager.getConfig(),
+        isFirstRun: isFirstRun
+    };
+
+    return response;
+};
 
 const Main = React.createClass({
 
@@ -72,25 +82,24 @@ const Main = React.createClass({
     componentDidMount: function () {
         var component = this;
 
-        AjaxFetch('getUserConfig').then(configResponse => {
-            console.log(configResponse);
-            if (configResponse.isFirstRun) {
-                component.setState({
-                    isAppLoaded: true,
-                    isConfigAbsent: true
-                });
-            } else {
-                AjaxFetch('getRomsInfo').then(romsResponse => {
-                    component.setState({
-                        isAppLoaded: true,
-                        userConfig: configResponse.config,
-                        romsInfo: romsResponse,
-                        currentConsole: "NDS",
-                        currentGameIndex: 0
-                    });
-                });
-            }
-        });
+        var configResponse =getUserConfig();
+        console.log(configResponse);
+        if (configResponse.isFirstRun) {
+            component.setState({
+                isAppLoaded: true,
+                isConfigAbsent: true
+            });
+        } else {
+            var romsResponse = getRomsInfo();
+
+            component.setState({
+                isAppLoaded: true,
+                userConfig: configResponse.config,
+                romsInfo: romsResponse,
+                currentConsole: "NDS",
+                currentGameIndex: 0
+            });
+        }
     },
 
     onGameChosen: function (i) {

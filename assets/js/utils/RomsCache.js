@@ -1,13 +1,12 @@
 'use strict';
 
-const fs = require('fs');
 const Constant = require('./Constant');
 const ConfigManager = require('./ConfigManager');
 
 let indexedRoms = null;
 
 try {
-    indexedRoms = JSON.parse(fs.readFileSync(Constant.romsCache, 'utf8'));
+    indexedRoms = JSON.parse(WINDOW_NODE.fs.readFileSync(Constant.romsCache, 'utf8'));
 } catch (e) {
     if (e.code !== 'ENOENT') {
         console.log(e);
@@ -17,13 +16,13 @@ try {
 function indexData(rootPath) {
     const indexedObj = {};
 
-    fs.readdirSync(rootPath).forEach(filename => {
+    WINDOW_NODE.fs.readdirSync(rootPath).forEach(filename => {
         if (Constant.platform[filename.toUpperCase()]) {
             const platformPath = rootPath + '/' + filename;
             let gamesFolder = null;
             let coversFolder = null;
 
-            fs.readdirSync(platformPath).forEach(filename => {
+            WINDOW_NODE.fs.readdirSync(platformPath).forEach(filename => {
                 if (filename.toUpperCase() === 'GAMES') {
                     gamesFolder = platformPath + '/' + filename;
                 } else if (filename.toUpperCase() === 'COVERS') {
@@ -45,7 +44,7 @@ function indexData(rootPath) {
         value.games.list = [];
         value.games.alphabet = [];
 
-        fs.readdirSync(value.games.path).forEach(filename => {
+        WINDOW_NODE.fs.readdirSync(value.games.path).forEach(filename => {
             let c = filename.substring(0, 1);
             let char = Number.isInteger(Number(c)) ? '#' : c.toUpperCase();
 
@@ -59,7 +58,7 @@ function indexData(rootPath) {
         if (value.covers.path) {
             value.covers.list = {};
 
-            fs.readdirSync(value.covers.path).forEach(filename => {
+            WINDOW_NODE.fs.readdirSync(value.covers.path).forEach(filename => {
                 var separatorIndex = filename.lastIndexOf('.');
                 var name = filename.substring(0, separatorIndex);
                 value.covers.list[name] = filename.substring(separatorIndex);
@@ -74,7 +73,7 @@ const RomsCache = {
     getIndexed: (refresh) => {
         if (refresh) {
             indexedRoms = indexData(ConfigManager.getConfig().romsRoot);
-            fs.writeFileSync(Constant.romsCache, JSON.stringify(indexedRoms), {encoding: 'utf8'});
+            WINDOW_NODE.fs.writeFileSync(Constant.romsCache, JSON.stringify(indexedRoms), {encoding: 'utf8'});
             console.log("The file was saved!");
         }
 

@@ -188,7 +188,6 @@ var CoverFlow = React.createClass({
         var virtualIndex = this.props.currentGameIndex + relativeIndex;
         var romsLength = this.props.roms.games.list.length;
 
-        debugger;
 
         if (virtualIndex < 0) {
             var front = romsLength + virtualIndex;

@@ -1,20 +1,19 @@
 'use strict';
 
-const fs = require('fs');
 const Constant = require('./Constant');
 
 let userConfig = null;
 
 try {
-    fs.accessSync(Constant.dataDir, fs.F_OK);
+    WINDOW_NODE.fs.accessSync(Constant.dataDir, fs.F_OK);
 } catch (e) {
     if (e.code === 'ENOENT') {
-        fs.mkdirSync(Constant.dataDir);
+        WINDOW_NODE.fs.mkdirSync(Constant.dataDir);
     }
 }
 
 try {
-    userConfig = JSON.parse(fs.readFileSync(Constant.userConfig, 'utf8'));
+    userConfig = JSON.parse(WINDOW_NODE.fs.readFileSync(Constant.userConfig, 'utf8'));
 } catch (e) {
     if (e.code !== 'ENOENT') {
         console.log(e);
@@ -26,7 +25,7 @@ const ConfigManager = {
         return userConfig;
     },
     createAndGet: function (rootPath) {
-        fs.readdirSync(rootPath);
+        WINDOW_NODE.fs.readdirSync(rootPath);
         userConfig = {
             romsRoot: rootPath,
             coverSetup: {
@@ -39,7 +38,7 @@ const ConfigManager = {
                 "selectedCoverZ": 46
             }
         };
-        fs.writeFileSync(Constant.userConfig, JSON.stringify(userConfig), {encoding: 'utf8'});
+        WINDOW_NODE.fs.writeFileSync(Constant.userConfig, JSON.stringify(userConfig), {encoding: 'utf8'});
         console.log("Config file was saved!");
         return userConfig;
     }
