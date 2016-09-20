@@ -4,12 +4,25 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 const AjaxFetch = require('../utils/AjaxFetch');
+const RomsCache = require('../utils/RomsCache');
 const AplphabetNav = require('./AplphabetNav');
 const CoverFlow = require('./CoverFlow');
 const BottomPanel = require('./BottomPanel');
 const Loader = require('./Loader');
 const WelcomeScreen = require('./WelcomeScreen');
 const ModalSettings = require('./ModalSettings');
+
+function getRomsInfo (isRefreshCache) {
+    let indexed = RomsCache.getIndexed(isRefreshCache);
+
+    if (!indexed) {
+        indexed = RomsCache.getIndexed(true);
+    }
+
+    return indexed
+};
+
+
 
 const Main = React.createClass({
 
@@ -24,26 +37,26 @@ const Main = React.createClass({
     configCreatedHandler: function (config) {
         var component = this;
 
-        AjaxFetch('getRomsInfo', {refreshCache: true}).then(romsResponse => {
-            var currentConsole = null;
+        var romsResponse = getRomsInfo(true);
+        var currentConsole = null;
 
-            for (var k in romsResponse) {
-                if (!currentConsole || currentConsole > k) {
-                    currentConsole = k;
-                }
+        for (var k in romsResponse) {
+            if (!currentConsole || currentConsole > k) {
+                currentConsole = k;
             }
+        }
 
-            component.setState({
-                isAppLoaded: true,
-                isConfigAbsent: false,
-                userConfig: config,
-                romsInfo: romsResponse,
-                currentConsole: currentConsole,
-                currentGameIndex: 0
-            });
-
-            console.log(romsResponse);
+        component.setState({
+            isAppLoaded: true,
+            isConfigAbsent: false,
+            userConfig: config,
+            romsInfo: romsResponse,
+            currentConsole: currentConsole,
+            currentGameIndex: 0
         });
+
+        console.log(romsResponse);
+
     },
     getInitialState: function () {
         return {

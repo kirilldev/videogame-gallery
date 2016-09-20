@@ -1,4 +1,4 @@
-var Constant = require('../../../server/Constant');
+var Constant = require('./Constant');
 var THREE = require('three');
 
 var MATERIALS = {

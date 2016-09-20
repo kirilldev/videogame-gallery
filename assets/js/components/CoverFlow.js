@@ -5,7 +5,7 @@
 var React = require('react');
 var THREE = require('three');
 var ThreeCoverLoader = require('../utils/ThreeCoverLoader');
-var Constant = require('../../../server/Constant');
+var Constant = require('../utils/Constant');
 
 var visibleCovers = [];
 var currentGameIndex = 1;

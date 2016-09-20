@@ -3,10 +3,10 @@
 const express = require('express');
 const fs = require('fs');
 const app = express();
-const Constant = require('./server/Constant');
+const Constant = require('./assets/js/utils/Constant');
 const FileSystem = require('./server/FileSystem');
-const ConfigManager = require('./server/ConfigManager');
-const RomsCache = require('./server/RomsCache');
+const ConfigManager = require('./assets/js/utils/ConfigManager');
+const RomsCache = require('./assets/js/utils/RomsCache');
 const CoverOptimizer = require('./server/CoverOptimizer');
 const APP_PORT = 3001;
 
@@ -16,15 +16,6 @@ const APP_PORT = 3001;
 
 app.use('/assets', express.static('assets'));
 app.get('/', (req, res) =>  res.sendfile('./views/index.html'));
-app.get('/getRomsInfo', (req, res) => {
-    let indexed = RomsCache.getIndexed(req.query.refreshCache);
-
-    if (!indexed) {
-        indexed = RomsCache.getIndexed(true);
-    }
-
-    res.json(indexed)
-});
 app.get('/getCover', function (req, res) {
     const optimizedCoverPath = Constant.coversCache + '/' + req.query.platform + '/' + req.query.game;
 
