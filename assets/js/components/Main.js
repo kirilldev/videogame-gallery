@@ -96,7 +96,7 @@ const Main = React.createClass({
                 isAppLoaded: true,
                 userConfig: configResponse.config,
                 romsInfo: romsResponse,
-                currentConsole: "NDS",
+                currentConsole: "N64",
                 currentGameIndex: 0
             });
         }

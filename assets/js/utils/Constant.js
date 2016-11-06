@@ -1,10 +1,10 @@
 'use strict';
 
 const Constants = Object.create(null);
-Constants.dataDir = WINDOW_NODE.__dirname + '/data';
-Constants.romsCache = Constants.dataDir + '/cache.json';
-Constants.coversCache = Constants.dataDir + '/covers';
-Constants.userConfig = Constants.dataDir + '/config.json';
+Constants.dataDir = WINDOW_NODE.__dirname + '\\data';
+Constants.romsCache = Constants.dataDir + '\\cache.json';
+Constants.coversCache = Constants.dataDir + '\\covers';
+Constants.userConfig = Constants.dataDir + '\\config.json';
 
 Constants.platform = {
     "GENESIS": {

@@ -9,14 +9,12 @@
 <div id="app"></div>
 
 <script>
-
-
     const WINDOW_NODE = {};
     WINDOW_NODE.fs = window.require('fs');
     WINDOW_NODE.__dirname = process.cwd();
 
     var gui = require('nw.gui');
-    console.log(gui.Window.isFullscreen);
+    //console.log(gui.Window.isFullscreen);
     // Create an empty menu
     var menu = new gui.Menu();
 

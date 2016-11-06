@@ -1,5 +1,6 @@
 var Constant = require('./Constant');
 var THREE = require('three');
+const CoverOptimizer = require('./CoverOptimizer');
 
 var MATERIALS = {
     'BASIC': THREE.MeshBasicMaterial,
